@@ -26,12 +26,6 @@ export default function Insert() {
 			case 'SubjectTime':
 				navigation.navigate('InsertSubjectTime');
 				break;
-			case 'Registro':
-				navigation.navigate('InsertStudentRegistro');
-				break;
-			case 'Matricula':
-				navigation.navigate('InsertMatricula');
-				break;
 			case 'User':
 				navigation.navigate('InsertUser');
 				break;
@@ -41,7 +35,7 @@ export default function Insert() {
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position='center'>
-				<View style={specificStyles.cardContainer}>
+				<View style={[styles.cardContainer, { marginVertical: 15, gap: 10 }]}>
 					<Text style={styles.cardText}>Cadastros</Text>
 					<TouchableOpacity
 						style={[styles.cardButton, specificStyles.cardButton]}
@@ -66,18 +60,6 @@ export default function Insert() {
 						onPress={() => handleNavigation('SubjectTime')}
 					>
 						<Text style={styles.cardButtonText}>Horário</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
-						onPress={() => handleNavigation('Matricula')}
-					>
-						<Text style={styles.cardButtonText}>Matrícula</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
-						onPress={() => handleNavigation('Registro')}
-					>
-						<Text style={styles.cardButtonText}>Registro</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={[styles.cardButton, specificStyles.cardButton]}

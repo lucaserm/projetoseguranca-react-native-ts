@@ -1,35 +1,80 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	FlatList,
+	ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-import { AntDesign } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
 
 import Card from '../../../components/Card';
+import Message from '../../../components/Message';
+import Separator from '../../../components/Separator';
+import { IOcorrencia } from '../../../context/AuthProvider/types';
+import Api from '../../../api';
 
 export default function NotesApproved() {
 	const navigation = useNavigation();
 
 	const [message, setMessage] = useState('');
+	const [loading, setLoading] = useState(true);
+	const [ocorrencias, setOcorrencias] = useState<IOcorrencia[]>([]);
+
+	useEffect(() => {
+		getData();
+	}, []);
+
+	const getData = async () => {
+		const { data }: { data: IOcorrencia[] } = await Api.get(
+			'ocorrencia/listar'
+		);
+		setOcorrencias(
+			data.filter((ocorrencia) => {
+				return ocorrencia.status == 'Aprovada';
+			})
+		);
+		setLoading(false);
+	};
 
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			{message !== '' && (
-				<View style={styles.message}>
-					<Text style={styles.messageText}>{message}</Text>
-					<TouchableOpacity
-						style={styles.messageButton}
-						onPress={() => setMessage('')}
-					>
-						<AntDesign name={'close'} size={20} color={'#FAFAFA'} />
-					</TouchableOpacity>
-				</View>
+				<Message message={message} handleClose={() => setMessage('')} />
 			)}
 			<Card position={'center'}>
-				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
-					<Text style={[styles.cardText]}>Ocorrências Encaminhadas</Text>
+				<View
+					style={[
+						styles.cardContainer,
+						specificStyles.cardContainer,
+						{ justifyContent: 'center', flex: 1 },
+					]}
+				>
+					<Text style={[styles.cardText]}>Aprovadas</Text>
+					{loading ? (
+						<ActivityIndicator />
+					) : (
+						<>
+							{ocorrencias.length == 0 ? (
+								<Text> Nenhuma ocorrência aprovada.</Text>
+							) : (
+								<FlatList
+									style={styles.list}
+									data={ocorrencias}
+									ItemSeparatorComponent={Separator}
+									renderItem={({ item }) => (
+										<TouchableOpacity style={styles.listButton}>
+											<Text>{item.relatorio}</Text>
+											<Text>{item.estudante.nome}</Text>
+										</TouchableOpacity>
+									)}
+								/>
+							)}
+						</>
+					)}
 				</View>
 			</Card>
 			<TouchableOpacity

@@ -16,6 +16,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { globalStyles as styles } from '../../styles/globalStyles';
 
 import Card from '../../components/Card';
+import Message from '../../components/Message';
 
 export default function Login() {
 	const [code, setCode] = useState('');
@@ -44,15 +45,7 @@ export default function Login() {
 		<View style={[styles.container, specificStyles.container]}>
 			<>
 				{message !== '' && (
-					<View style={styles.message}>
-						<Text style={styles.messageText}>{message}</Text>
-						<TouchableOpacity
-							style={styles.messageButton}
-							onPress={() => setMessage('')}
-						>
-							<AntDesign name={'close'} size={20} color={'#FAFAFA'} />
-						</TouchableOpacity>
-					</View>
+					<Message message={message} handleClose={() => setMessage('')} />
 				)}
 				{auth.loading ? (
 					<ActivityIndicator size={'large'} />

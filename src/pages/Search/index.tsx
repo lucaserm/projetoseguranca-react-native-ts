@@ -17,6 +17,7 @@ import { globalStyles as styles } from '../../styles/globalStyles';
 import { AntDesign } from '@expo/vector-icons';
 
 import Card from '../../components/Card';
+import Message from '../../components/Message';
 
 export default function Search() {
 	const [ra, setRa] = useState('');
@@ -34,8 +35,8 @@ export default function Search() {
 		try {
 			await auth.getEstudante({
 				ra: ra.trim(),
-				nome: nome.trim(),
-				cpf: cpf.trim(),
+				nome: nome.trim() != '' ? nome.trim().replace(' ', '%') : '0',
+				cpf: cpf.trim().replace(' ', '%'),
 			});
 			navigation.navigate('SearchStudent');
 			setRa('');
@@ -52,15 +53,7 @@ export default function Search() {
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			{message !== '' && (
-				<View style={styles.message}>
-					<Text style={styles.messageText}>{message}</Text>
-					<TouchableOpacity
-						style={styles.messageButton}
-						onPress={() => setMessage('')}
-					>
-						<AntDesign name={'close'} size={20} color={'#FAFAFA'} />
-					</TouchableOpacity>
-				</View>
+				<Message message={message} handleClose={() => setMessage('')} />
 			)}
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>

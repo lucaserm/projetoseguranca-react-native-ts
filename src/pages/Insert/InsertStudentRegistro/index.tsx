@@ -8,65 +8,68 @@ import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
 
 import Card from '../../../components/Card';
+import Api from '../../../api';
+import { useAuth } from '../../../context/AuthProvider/useAuth';
+import Message from '../../../components/Message';
+import Separator from '../../../components/Separator';
 
 export default function InsertStudentRegistro() {
 	const navigation = useNavigation();
-
+	const auth = useAuth();
 	const [message, setMessage] = useState('');
-	const [periodo, setPeriodo] = useState('');
-	const [diaSemana, setDiaSemana] = useState('');
-	const [tempoInicio, setTempoInicio] = useState('');
-	const [tempoFim, setTempoFim] = useState('');
+	const [descricao, setDescricao] = useState('');
+	const [diaLiberacao, setDiaLiberacao] = useState('');
 
-	const handleSubmit = () => {};
+	const handleSubmit = async () => {
+		if (descricao == '') return setMessage('Insira uma descrição.');
+		if (diaLiberacao == '')
+			return setMessage('Insira uma data para liberação.');
+		try {
+			await Api.post('/estudante/registro/salvar/?id=' + auth.estudante[0].id, {
+				descricao,
+				dia_liberacao: diaLiberacao,
+			});
+			await auth.getEstudante({
+				ra: '',
+				nome: auth.estudante[0].nome,
+				cpf: '',
+			});
+			setDescricao('');
+			setDiaLiberacao('');
+		} catch (e) {
+			return;
+		}
+	};
 
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			{message !== '' && (
-				<View style={styles.message}>
-					<Text style={styles.messageText}>{message}</Text>
-					<TouchableOpacity
-						style={styles.messageButton}
-						onPress={() => setMessage('')}
-					>
-						<AntDesign name={'close'} size={20} color={'#FAFAFA'} />
-					</TouchableOpacity>
-				</View>
+				<Message message={message} handleClose={() => setMessage('')} />
 			)}
 			<Card position={'center'}>
-				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
-					<Text style={[styles.cardText]}>Inserir Curso</Text>
+				<View
+					style={[
+						styles.cardContainer,
+						specificStyles.cardContainer,
+						{ justifyContent: 'center', flex: 1 },
+					]}
+				>
+					<Text style={[styles.cardText]}>Inserir Registro</Text>
 					<TextInput
 						style={styles.cardInput}
-						placeholder='PERIODO'
+						placeholder='DESCRIÇÃO'
 						placeholderTextColor={'#EEE'}
-						value={periodo}
-						onChangeText={(value) => setPeriodo(value)}
+						value={descricao}
+						onChangeText={(value) => setDescricao(value)}
 					/>
 					<TextInput
 						style={styles.cardInput}
-						placeholder='DIA DA SEMANA'
+						placeholder='DIA DA LIBERAÇÃO'
 						placeholderTextColor={'#EEE'}
-						value={diaSemana}
-						onChangeText={(value) => setDiaSemana(value)}
+						value={diaLiberacao}
+						onChangeText={(value) => setDiaLiberacao(value)}
 					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='TEMPO INÍCIO'
-						placeholderTextColor={'#EEE'}
-						value={tempoInicio}
-						onChangeText={(value) => setTempoInicio(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='TEMPO FIM'
-						placeholderTextColor={'#EEE'}
-						value={tempoFim}
-						onChangeText={(value) => setTempoFim(value)}
-					/>
-					<Text
-						style={{ backgroundColor: '#DDD', height: 1, width: '80%' }}
-					></Text>
+					<Separator />
 					<TouchableOpacity style={[styles.cardButton]} onPress={handleSubmit}>
 						<Text style={styles.cardButtonText}>Enviar</Text>
 					</TouchableOpacity>

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	View,
 	Text,
 	TouchableOpacity,
-	TextInput,
-	FlatList,
 	ActivityIndicator,
+	FlatList,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,23 +15,21 @@ import { specificStyles } from '../styles';
 
 import Card from '../../../components/Card';
 import Api from '../../../api';
-
+import { useAuth } from '../../../context/AuthProvider/useAuth';
 import { IDisciplina } from '../../../context/AuthProvider/types';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
 
-export default function InsertSubjectTime() {
+export default function InsertStudentSubject() {
 	const navigation = useNavigation();
+	const auth = useAuth();
 
-	const [idDisciplina, setIdDisciplina] = useState('');
+	const [idDisciplinaInicial, setIdDisciplinaInicial] = useState<string[]>([]);
+	const [idDisciplina, setIdDisciplina] = useState<string[]>([]);
 	const [disciplinas, setDisciplinas] = useState<IDisciplina[]>([]);
-
 	const [loading, setLoading] = useState(true);
+
 	const [message, setMessage] = useState('');
-	const [periodo, setPeriodo] = useState('');
-	const [diaSemana, setDiaSemana] = useState('');
-	const [tempoInicio, setTempoInicio] = useState('');
-	const [tempoFim, setTempoFim] = useState('');
 
 	useEffect(() => {
 		getData();
@@ -42,27 +39,46 @@ export default function InsertSubjectTime() {
 		const { data } = await Api.get('disciplina/listar');
 		setLoading(false);
 		setDisciplinas(data);
+		setIds(data);
+	};
+
+	const setIds = (list: IDisciplina[]) => {
+		const lista: string[] = [];
+		list.map((disciplina) => {
+			auth.estudante[0].disciplinas.map((disciplinasEstudante) => {
+				if (disciplinasEstudante.id == disciplina.id) {
+					lista.push(disciplina.id);
+				}
+			});
+		});
+		setIdDisciplina(lista);
+		setIdDisciplinaInicial(lista);
 	};
 
 	const handleSubmit = async () => {
-		if (idDisciplina == '') return setMessage('Clique em uma disciplina.');
-		if (periodo == '') return setMessage('Insira o período do horário.');
-		if (diaSemana == '')
-			return setMessage('Insira o dia da semana do horário.');
-		if (tempoInicio == '')
-			return setMessage('Insira o tempo que inicia a aula.');
-		if (tempoFim == '') return setMessage('Insira o tempo que termina a aula');
-		await Api.post('horario/salvar/?id=' + idDisciplina, {
-			periodo: periodo.trim(),
-			dia_semana: diaSemana.trim(),
-			tempo_inicio: tempoInicio.trim(),
-			tempo_fim: tempoFim.trim(),
+		if (idDisciplina.length == 0)
+			return setMessage('Selecione pelo menos uma disciplina.');
+		if (idDisciplina == idDisciplinaInicial)
+			return setMessage('Nenhuma alteração .');
+		let formattedID = '';
+		idDisciplina.map((id) => {
+			return (formattedID += id + ' ');
 		});
-		setIdDisciplina('');
-		setPeriodo('');
-		setDiaSemana('');
-		setTempoInicio('');
-		setTempoFim('');
+		formattedID = formattedID.trim();
+		formattedID = formattedID.replace(' ', ',');
+		setLoading(true);
+		await Api.post(
+			'estudante/disciplina/salvar/?idEstudante=' +
+				auth.estudante[0].id +
+				'&id=' +
+				formattedID
+		);
+		await auth.getEstudante({
+			ra: '',
+			nome: auth.estudante[0].nome,
+			cpf: '',
+		});
+		setLoading(false);
 	};
 
 	return (
@@ -75,10 +91,10 @@ export default function InsertSubjectTime() {
 					style={[
 						styles.cardContainer,
 						specificStyles.cardContainer,
-						{ justifyContent: 'center' },
+						{ justifyContent: 'center', flex: 1 },
 					]}
 				>
-					<Text style={[styles.cardText]}>Horário à Disciplina</Text>
+					<Text style={[styles.cardText]}>Relacionar disciplinas</Text>
 					{loading ? (
 						<ActivityIndicator />
 					) : (
@@ -92,45 +108,26 @@ export default function InsertSubjectTime() {
 										style={[
 											styles.listButton,
 											{
-												backgroundColor:
-													item.id == idDisciplina ? '#2FF31F' : '#2FA34F',
+												backgroundColor: idDisciplina.includes(item.id)
+													? '#2FF31F'
+													: '#2FA34F',
 											},
 										]}
-										onPress={() => setIdDisciplina(item.id)}
+										onPress={() =>
+											setIdDisciplina(
+												idDisciplina.includes(item.id)
+													? idDisciplina.filter((i) => {
+															return i != item.id;
+													  })
+													: [...idDisciplina, item.id]
+											)
+										}
 									>
 										<Text>Disciplina: {item.nome}</Text>
 										<Text>{item.semestre} semestre</Text>
 										<Text>Turma : {item.turma}</Text>
 									</TouchableOpacity>
 								)}
-							/>
-							<TextInput
-								style={styles.cardInput}
-								placeholder='PERIODO'
-								placeholderTextColor={'#EEE'}
-								value={periodo}
-								onChangeText={(value) => setPeriodo(value)}
-							/>
-							<TextInput
-								style={styles.cardInput}
-								placeholder='DIA DA SEMANA'
-								placeholderTextColor={'#EEE'}
-								value={diaSemana}
-								onChangeText={(value) => setDiaSemana(value)}
-							/>
-							<TextInput
-								style={styles.cardInput}
-								placeholder='TEMPO INÍCIO'
-								placeholderTextColor={'#EEE'}
-								value={tempoInicio}
-								onChangeText={(value) => setTempoInicio(value)}
-							/>
-							<TextInput
-								style={styles.cardInput}
-								placeholder='TEMPO FIM'
-								placeholderTextColor={'#EEE'}
-								value={tempoFim}
-								onChangeText={(value) => setTempoFim(value)}
 							/>
 							<Separator />
 							<TouchableOpacity

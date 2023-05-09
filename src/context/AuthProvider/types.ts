@@ -1,17 +1,34 @@
+import { Dispatch, SetStateAction } from 'react';
+
 export interface IUser {
 	code?: string;
 	token?: string;
 }
 
 export interface IEstudante {
-	id: string,
+	id: string;
 	nome: string;
 	ra: string;
 	cpf: string;
 	email_institucional: string;
 	responsavel: IResponsavel;
 	registros: IRegistro[];
-	ocorrencias: IOcorrencia[];
+	disciplinas: IDisciplina[];
+}
+
+export interface IDisciplina {
+	id: string;
+	nome: string;
+	semestre: string;
+	turma: string;
+	horarios: IHorario[];
+}
+
+export interface IHorario {
+	periodo: string;
+	dia_semana: string;
+	tempo_inicio: string;
+	tempo_fim: string;
 }
 
 export interface IResponsavel {
@@ -27,13 +44,22 @@ export interface IRegistro {
 }
 
 export interface IOcorrencia {
+	id: string;
 	data_ocorrencia: string;
 	nome_usuario_relacionado: string;
-	tipo_ocorrencia: string;
+	relatorio: string;
+	status: string;
+	usuario: IUsuario;
+	estudante: IEstudante;
+}
+
+export interface IUsuario {
+	nome: string;
 }
 
 export interface IContext extends IUser {
-	estudante: IEstudante[] | null;
+	estudante: IEstudante[];
+	setStudent: (estudante: IEstudante) => void;
 	loading: boolean;
 	authenticate: (code: string, password: string) => Promise<void>;
 	logout: () => void;

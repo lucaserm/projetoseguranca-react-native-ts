@@ -45,6 +45,17 @@ export const globalStyles = StyleSheet.create({
 		textAlign: 'center',
 		color: '#F2F4F3',
 	},
+	list: {
+		flex: 1,
+		width: '90%',
+	},
+	listButton: {
+		backgroundColor: '#2FA34F',
+		paddingVertical: 10,
+		paddingHorizontal: 30,
+		justifyContent: 'center',
+		borderRadius: 20,
+	},
 	message: {
 		width: 300,
 		marginTop: -20,

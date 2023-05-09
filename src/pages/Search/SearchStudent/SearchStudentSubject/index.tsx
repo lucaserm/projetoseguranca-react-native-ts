@@ -9,7 +9,7 @@ import { useAuth } from '../../../../context/AuthProvider/useAuth';
 import { propsStack } from '../../../mainStackParams';
 import Separator from '../../../../components/Separator';
 
-export default function SearchStudentReq() {
+export default function SearchStudentSubject() {
 	const navigation = useNavigation<propsStack>();
 	const auth = useAuth();
 
@@ -21,29 +21,36 @@ export default function SearchStudentReq() {
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
-					<Text style={[styles.cardText]}>Liberações</Text>
-					{auth.estudante[0].registros.length == 0 ? (
+					<Text style={[styles.cardText]}>Disciplinas</Text>
+					{auth.estudante[0].disciplinas.length == 0 ? (
 						<View>
-							<Text>Nenhum registro encontrado.</Text>
+							<Text>Nenhuma disciplina encontrada.</Text>
 						</View>
 					) : (
 						<FlatList
 							style={styles.list}
-							data={auth.estudante[0].registros.reverse()}
+							data={auth.estudante[0].disciplinas.reverse()}
 							ItemSeparatorComponent={Separator}
 							renderItem={({ item }) => (
-								<TouchableOpacity style={styles.listButton}>
-									<Text>{item.descricao}</Text>
-									<Text>{item.dia_liberacao}</Text>
-								</TouchableOpacity>
+								<View style={styles.listButton}>
+									<Text style={styles.cardButtonText}>
+										Matéria : {item.nome}
+									</Text>
+									<Text style={styles.cardButtonText}>
+										{item.semestre}° semestre
+									</Text>
+									<Text style={styles.cardButtonText}>
+										Turma : {item.turma}
+									</Text>
+								</View>
 							)}
 						/>
 					)}
 					<TouchableOpacity
 						style={[styles.cardButton, { backgroundColor: '#FF3000' }]}
-						onPress={() => navigation.navigate('InsertStudentRegistro')}
+						onPress={() => navigation.navigate('InsertStudentSubject')}
 					>
-						<Text style={styles.cardButtonText}>Criar registro</Text>
+						<Text style={styles.cardButtonText}>Registrar disciplina</Text>
 					</TouchableOpacity>
 				</View>
 			</Card>

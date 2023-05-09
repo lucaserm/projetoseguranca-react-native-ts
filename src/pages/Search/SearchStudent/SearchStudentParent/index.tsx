@@ -36,7 +36,7 @@ export default function SearchStudentParent() {
 				style={[styles.cardButton, specificStyles.cardButton]}
 				onPress={handleBack}
 			>
-				<Text style={{ textAlign: 'center', color: '#FAFAFA' }}>Voltar</Text>
+				<Text style={styles.cardButtonText}>Voltar</Text>
 			</TouchableOpacity>
 		</View>
 	);

@@ -9,6 +9,8 @@ import Card from '../../../components/Card';
 import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
 import Api from '../../../api';
+import Message from '../../../components/Message';
+import Separator from '../../../components/Separator';
 
 export default function InsertStudent() {
 	const navigation = useNavigation();
@@ -76,15 +78,7 @@ export default function InsertStudent() {
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			{message !== '' && (
-				<View style={styles.message}>
-					<Text style={styles.messageText}>{message}</Text>
-					<TouchableOpacity
-						style={styles.messageButton}
-						onPress={() => setMessage('')}
-					>
-						<AntDesign name={'close'} size={20} color={'#FAFAFA'} />
-					</TouchableOpacity>
-				</View>
+				<Message message={message} handleClose={() => setMessage('')} />
 			)}
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
@@ -117,9 +111,7 @@ export default function InsertStudent() {
 						value={email}
 						onChangeText={(value) => setEmail(value)}
 					/>
-					<Text
-						style={{ backgroundColor: '#DDD', height: 1, width: '80%' }}
-					></Text>
+					<Separator />
 					<TextInput
 						style={styles.cardInput}
 						placeholder='NOME RESPONSÁVEL'
@@ -141,9 +133,7 @@ export default function InsertStudent() {
 						value={emailResponsavel}
 						onChangeText={(value) => setEmailResponsavel(value)}
 					/>
-					<Text
-						style={{ backgroundColor: '#DDD', height: 1, width: '80%' }}
-					></Text>
+					<Separator />
 					<TouchableOpacity style={[styles.cardButton]} onPress={handleSubmit}>
 						<Text style={styles.cardButtonText}>Enviar</Text>
 					</TouchableOpacity>

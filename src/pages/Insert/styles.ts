@@ -5,6 +5,7 @@ export const specificStyles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	cardContainer: {
+		justifyContent: 'center',
 		marginVertical: 20,
 		gap: 10,
 	},

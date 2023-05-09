@@ -11,7 +11,7 @@ export const AuthContext = createContext<IContext>({} as IContext);
 
 export const AuthProvider = ({ children }: IAuthProvider) => {
 	const [user, setUser] = useState<IUser | null>();
-	const [estudante, setEstudante] = useState<IEstudante[] | null>([]);
+	const [estudante, setEstudante] = useState<IEstudante[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -19,6 +19,10 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
 			.then((res) => setUser(res))
 			.then(() => setLoading(false));
 	}, []);
+
+	function setStudent(estudante: IEstudante) {
+		setEstudante([estudante]);
+	}
 
 	async function authenticate(code: string, password: string) {
 		const response = await LoginRequest(code, password);
@@ -46,7 +50,7 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
 				email_institucional: res.email_institucional,
 				responsavel: res.responsavel,
 				registros: res.registros,
-				ocorrencias: res.ocorrencias,
+				disciplinas: res.disciplinas,
 			};
 		});
 		setEstudante(payload);
@@ -62,6 +66,7 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
 			value={{
 				...user,
 				estudante,
+				setStudent,
 				loading,
 				authenticate,
 				logout,

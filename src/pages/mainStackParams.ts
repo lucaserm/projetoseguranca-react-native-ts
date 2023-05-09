@@ -9,11 +9,13 @@ export type stackParamList = {
 	SearchStudentParent: undefined;
 	SearchStudentReq: undefined;
 	SearchStudentNote: undefined;
+	SearchStudentSubject: undefined;
 	//Rotas de cadastro
 	InsertIndex: undefined;
 	InsertStudent: undefined;
 	InsertStudentRegistro: undefined;
 	InsertStudentNotes: undefined;
+	InsertStudentSubject: undefined;
 	InsertCurso: undefined;
 	InsertSubject: undefined;
 	InsertSubjectTime: undefined;
