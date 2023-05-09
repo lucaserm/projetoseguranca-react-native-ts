@@ -3,20 +3,18 @@ import {
 	View,
 	Text,
 	TextInput,
-	TouchableOpacity,
 	StyleSheet,
 	ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../context/AuthProvider/useAuth';
 import { useNavigation } from '@react-navigation/native';
 import { propsStack } from '../mainStackParams';
-
 import { AntDesign } from '@expo/vector-icons';
-
 import { globalStyles as styles } from '../../styles/globalStyles';
-
 import Card from '../../components/Card';
 import Message from '../../components/Message';
+import Loading from '../../components/Loading';
+import Button from '../../components/Button';
 
 export default function Login() {
 	const [code, setCode] = useState('');
@@ -26,58 +24,56 @@ export default function Login() {
 	const auth = useAuth();
 	const navigation = useNavigation<propsStack>();
 
-	async function onFinish(values: { code: string; password: string }) {
-		if (code == '') return setMessage('Insira um código de servidor!');
-		if (password == '') return setMessage('Insira uma senha!');
+	const handleFinish = async () => {
+		if (!code || !!password) {
+			return setMessage('Por favor, preencha todos os campos.');
+		}
 		setLoading(true);
 		try {
-			await auth.authenticate(values.code, values.password);
+			await auth.authenticate(code, password);
 			navigation.navigate('HomeLogged');
-		} catch (e) {
+		} catch (error) {
 			setMessage('Código de servidor ou senha inválidos');
 			setCode('');
 			setPassword('');
+		} finally {
 			setLoading(false);
 		}
-	}
+	};
 
 	return (
 		<View style={[styles.container, specificStyles.container]}>
-			<>
-				{message !== '' && (
-					<Message message={message} handleClose={() => setMessage('')} />
-				)}
-				{auth.loading ? (
-					<ActivityIndicator size={'large'} />
-				) : (
-					<Card position={'center'}>
-						<View style={[styles.cardContainer, specificStyles.cardContainer]}>
-							<Text>Insira seu código de servidor:</Text>
-							<TextInput
-								value={code}
-								onChangeText={(e) => setCode(e)}
-								placeholder='Código:'
-								style={specificStyles.inputText}
-							/>
-							<Text>Insira sua senha:</Text>
-							<TextInput
-								value={password}
-								onChangeText={(e) => setPassword(e)}
-								placeholder='Senha:'
-								secureTextEntry={true}
-								style={specificStyles.inputText}
-							/>
-							{loading && <ActivityIndicator size={'large'} />}
-							<TouchableOpacity
-								style={styles.cardButton}
-								onPress={() => onFinish({ code, password })}
-							>
-								<Text style={styles.cardButtonText}>Entrar</Text>
-							</TouchableOpacity>
-						</View>
-					</Card>
-				)}
-			</>
+			{message ? (
+				<Message message={message} handleClose={() => setMessage('')} />
+			) : null}
+			{auth.loading ? (
+				<Loading />
+			) : (
+				<Card position='center'>
+					<View style={[styles.cardContainer, specificStyles.cardContainer]}>
+						<Text>Insira seu código de servidor:</Text>
+						<TextInput
+							value={code}
+							onChangeText={setCode}
+							placeholder='Código:'
+							style={specificStyles.inputText}
+						/>
+						<Text>Insira sua senha:</Text>
+						<TextInput
+							value={password}
+							onChangeText={setPassword}
+							placeholder='Senha:'
+							secureTextEntry={true}
+							style={specificStyles.inputText}
+						/>
+						{loading ? (
+							<ActivityIndicator size='large' />
+						) : (
+							<Button text={'Entrar'} onPress={handleFinish} back={true} />
+						)}
+					</View>
+				</Card>
+			)}
 		</View>
 	);
 }

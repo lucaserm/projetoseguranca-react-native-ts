@@ -18,6 +18,7 @@ import { AntDesign } from '@expo/vector-icons';
 
 import Card from '../../components/Card';
 import Message from '../../components/Message';
+import Button from '../../components/Button';
 
 export default function Search() {
 	const [ra, setRa] = useState('');
@@ -29,8 +30,8 @@ export default function Search() {
 	const navigation = useNavigation<propsStack>();
 
 	const handleSubmit = async () => {
-		if (ra == '' && nome == '' && cpf == '')
-			return setMessage('Insira algum dado!');
+		if (!ra && !nome && !cpf)
+			return setMessage('Por favor, preencha algum campo.');
 		setLoading(true);
 		try {
 			await auth.getEstudante({
@@ -39,14 +40,14 @@ export default function Search() {
 				cpf: cpf.trim().replace(' ', '%'),
 			});
 			navigation.navigate('SearchStudent');
+		} catch (error) {
+			setMessage('Estudante não encontrado.');
+		} finally {
 			setRa('');
 			setCpf('');
 			setNome('');
 			setMessage('');
 			setLoading(false);
-		} catch (error) {
-			setLoading(false);
-			setMessage('Estudante não encontrado.');
 		}
 	};
 
@@ -87,12 +88,7 @@ export default function Search() {
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleSubmit}
-			>
-				<Text style={{ textAlign: 'center', color: '#FAFAFA' }}>Ver</Text>
-			</TouchableOpacity>
+			<Button text={'Ver'} onPress={handleSubmit} back={true} />
 		</View>
 	);
 }

@@ -1,85 +1,83 @@
 import React, { useEffect, useState } from 'react';
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	ActivityIndicator,
-	FlatList,
-} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-import { AntDesign } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
-
 import Card from '../../../components/Card';
 import Api from '../../../api';
 import { useAuth } from '../../../context/AuthProvider/useAuth';
 import { IDisciplina } from '../../../context/AuthProvider/types';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
+import Loading from '../../../components/Loading';
+import ListEmpty from '../../../components/ListEmpty';
+import SubjectItem from '../../../components/SubjectItem';
+import Button from '../../../components/Button';
 
 export default function InsertStudentSubject() {
 	const navigation = useNavigation();
-	const auth = useAuth();
-
-	const [idDisciplinaInicial, setIdDisciplinaInicial] = useState<string[]>([]);
-	const [idDisciplina, setIdDisciplina] = useState<string[]>([]);
+	const { estudante, getEstudante } = useAuth();
 	const [disciplinas, setDisciplinas] = useState<IDisciplina[]>([]);
 	const [loading, setLoading] = useState(true);
-
 	const [message, setMessage] = useState('');
+	const [idDisciplinas, setIdDisciplinas] = useState<string[]>([]);
 
 	useEffect(() => {
 		getData();
 	}, []);
 
 	const getData = async () => {
-		const { data } = await Api.get('disciplina/listar');
-		setLoading(false);
-		setDisciplinas(data);
-		setIds(data);
-	};
-
-	const setIds = (list: IDisciplina[]) => {
-		const lista: string[] = [];
-		list.map((disciplina) => {
-			auth.estudante[0].disciplinas.map((disciplinasEstudante) => {
-				if (disciplinasEstudante.id == disciplina.id) {
-					lista.push(disciplina.id);
-				}
-			});
-		});
-		setIdDisciplina(lista);
-		setIdDisciplinaInicial(lista);
+		try {
+			const { data } = await Api.get<IDisciplina[]>('disciplina/listar');
+			setDisciplinas(data);
+			const listaDisciplinas = data.filter((disciplina) =>
+				estudante[0].disciplinas.some(
+					(disciplinaEstudante) => disciplinaEstudante.id === disciplina.id
+				)
+			);
+			setIdDisciplinas(listaDisciplinas.map((disciplina) => disciplina.id));
+		} catch (e) {
+			setMessage('Ocorreu um erro ao buscar as disciplinas.');
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleSubmit = async () => {
-		if (idDisciplina.length == 0)
-			return setMessage('Selecione pelo menos uma disciplina.');
-		if (idDisciplina == idDisciplinaInicial)
-			return setMessage('Nenhuma alteração .');
-		let formattedID = '';
-		idDisciplina.map((id) => {
-			return (formattedID += id + ' ');
-		});
-		formattedID = formattedID.trim();
-		formattedID = formattedID.replace(' ', ',');
 		setLoading(true);
-		await Api.post(
-			'estudante/disciplina/salvar/?idEstudante=' +
-				auth.estudante[0].id +
-				'&id=' +
-				formattedID
-		);
-		await auth.getEstudante({
-			ra: '',
-			nome: auth.estudante[0].nome,
-			cpf: '',
-		});
-		setLoading(false);
+		try {
+			await Api.post(
+				`estudante/disciplina/salvar/?idEstudante=${
+					estudante[0].id
+				}&id=${idDisciplinas.join(',')}`
+			);
+			try {
+				await getEstudante({
+					ra: '',
+					nome: estudante[0].nome,
+					cpf: '',
+				});
+			} catch (e) {
+				setMessage('Ocorreu um erro ao renovar o estudante.');
+			}
+		} catch (e) {
+			setMessage('Ocorreu um erro ao relacionar as disciplinas.');
+		} finally {
+			setLoading(false);
+		}
 	};
+
+	function handleDisciplinaPress(disciplina: IDisciplina) {
+		const isSelected = idDisciplinas.includes(disciplina.id);
+		if (!isSelected) {
+			//Se não está relacionado, relaciona
+			setIdDisciplinas((ids) => [...ids, disciplina.id]);
+		} else {
+			//Se já está relacionado, desvincula
+			setIdDisciplinas((ids) => ids.filter((id) => id !== disciplina.id));
+		}
+	}
 
 	return (
 		<View style={[styles.container, specificStyles.container]}>
@@ -96,56 +94,31 @@ export default function InsertStudentSubject() {
 				>
 					<Text style={[styles.cardText]}>Relacionar disciplinas</Text>
 					{loading ? (
-						<ActivityIndicator />
+						<Loading />
 					) : (
 						<>
 							<FlatList
 								style={{ height: 100, width: '90%' }}
 								data={disciplinas}
 								ItemSeparatorComponent={Separator}
-								renderItem={({ item }) => (
-									<TouchableOpacity
-										style={[
-											styles.listButton,
-											{
-												backgroundColor: idDisciplina.includes(item.id)
-													? '#2FF31F'
-													: '#2FA34F',
-											},
-										]}
-										onPress={() =>
-											setIdDisciplina(
-												idDisciplina.includes(item.id)
-													? idDisciplina.filter((i) => {
-															return i != item.id;
-													  })
-													: [...idDisciplina, item.id]
-											)
-										}
-									>
-										<Text>Disciplina: {item.nome}</Text>
-										<Text>{item.semestre} semestre</Text>
-										<Text>Turma : {item.turma}</Text>
-									</TouchableOpacity>
-								)}
+								renderItem={({ item }) =>
+									SubjectItem({
+										item,
+										idDisciplinas,
+										onPress: handleDisciplinaPress,
+									})
+								}
+								ListEmptyComponent={ListEmpty({
+									text: 'Nenhuma disciplina registrada.',
+								})}
 							/>
 							<Separator />
-							<TouchableOpacity
-								style={[styles.cardButton]}
-								onPress={handleSubmit}
-							>
-								<Text style={styles.cardButtonText}>Enviar</Text>
-							</TouchableOpacity>
+							<Button text={'Enviar'} onPress={handleSubmit} />
 						</>
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

@@ -8,28 +8,21 @@ import { specificStyles } from './styles';
 import Card from '../../components/Card';
 
 import { propsStack } from '../mainStackParams';
+import Button from '../../components/Button';
+
+const routes: any = {
+	Student: 'InsertStudent',
+	Curso: 'InsertCurso',
+	Subject: 'InsertSubject',
+	SubjectTime: 'InsertSubjectTime',
+	User: 'InsertUser',
+};
 
 export default function Insert() {
 	const navigation = useNavigation<propsStack>();
 
 	const handleNavigation = (route: string) => {
-		switch (route) {
-			case 'Student':
-				navigation.navigate('InsertStudent');
-				break;
-			case 'Curso':
-				navigation.navigate('InsertCurso');
-				break;
-			case 'Subject':
-				navigation.navigate('InsertSubject');
-				break;
-			case 'SubjectTime':
-				navigation.navigate('InsertSubjectTime');
-				break;
-			case 'User':
-				navigation.navigate('InsertUser');
-				break;
-		}
+		navigation.navigate(routes[route]);
 	};
 
 	return (
@@ -37,36 +30,20 @@ export default function Insert() {
 			<Card position='center'>
 				<View style={[styles.cardContainer, { marginVertical: 15, gap: 10 }]}>
 					<Text style={styles.cardText}>Cadastros</Text>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
+					<Button
+						text={'Estudante'}
 						onPress={() => handleNavigation('Student')}
-					>
-						<Text style={styles.cardButtonText}>Estudante</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
-						onPress={() => handleNavigation('Curso')}
-					>
-						<Text style={styles.cardButtonText}>Curso</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
+					/>
+					<Button text={'Curso'} onPress={() => handleNavigation('Curso')} />
+					<Button
+						text={'Disciplina'}
 						onPress={() => handleNavigation('Subject')}
-					>
-						<Text style={styles.cardButtonText}>Disciplina</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
+					/>
+					<Button
+						text={'Horário'}
 						onPress={() => handleNavigation('SubjectTime')}
-					>
-						<Text style={styles.cardButtonText}>Horário</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
-						onPress={() => handleNavigation('User')}
-					>
-						<Text style={styles.cardButtonText}>Usuário</Text>
-					</TouchableOpacity>
+					/>
+					<Button text={'Usuário'} onPress={() => handleNavigation('User')} />
 				</View>
 			</Card>
 		</View>

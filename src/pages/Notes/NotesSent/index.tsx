@@ -16,10 +16,12 @@ import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
 import { IOcorrencia } from '../../../context/AuthProvider/types';
 import Api from '../../../api';
+import NotesItem from '../../../components/NotesItem';
+import ListEmpty from '../../../components/ListEmpty';
+import Button from '../../../components/Button';
 
 export default function NotesSent() {
 	const navigation = useNavigation();
-
 	const [message, setMessage] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [ocorrencias, setOcorrencias] = useState<IOcorrencia[]>([]);
@@ -29,15 +31,19 @@ export default function NotesSent() {
 	}, []);
 
 	const getData = async () => {
-		const { data }: { data: IOcorrencia[] } = await Api.get(
-			'ocorrencia/listar'
-		);
-		setOcorrencias(
-			data.filter((ocorrencia) => {
-				return ocorrencia.status == 'Encaminhada';
-			})
-		);
-		setLoading(false);
+		try {
+			const { data }: { data: IOcorrencia[] } = await Api.get(
+				'ocorrencia/listar'
+			);
+			const filteredOcorrencias = data.filter(
+				(ocorrencia) => ocorrencia.status === 'Encaminhada'
+			);
+			setOcorrencias(filteredOcorrencias);
+		} catch (error) {
+			setMessage('Erro ao buscar as ocorrências');
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -57,32 +63,19 @@ export default function NotesSent() {
 					{loading ? (
 						<ActivityIndicator />
 					) : (
-						<>
-							{ocorrencias.length == 0 ? (
-								<Text> Nenhuma ocorrência encaminhada.</Text>
-							) : (
-								<FlatList
-									style={styles.list}
-									data={ocorrencias}
-									ItemSeparatorComponent={Separator}
-									renderItem={({ item }) => (
-										<TouchableOpacity style={styles.listButton}>
-											<Text>{item.relatorio}</Text>
-											<Text>{item.estudante.nome}</Text>
-										</TouchableOpacity>
-									)}
-								/>
-							)}
-						</>
+						<FlatList
+							style={styles.list}
+							data={ocorrencias}
+							ItemSeparatorComponent={Separator}
+							renderItem={NotesItem}
+							ListEmptyComponent={ListEmpty({
+								text: 'Nenhuma ocorrência encaminhada.',
+							})}
+						/>
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

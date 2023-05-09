@@ -6,6 +6,7 @@ import { globalStyles as styles } from '../../../../styles/globalStyles';
 import Card from '../../../../components/Card';
 import { specificStyles } from '../../styles';
 import { useAuth } from '../../../../context/AuthProvider/useAuth';
+import Button from '../../../../components/Button';
 
 export default function SearchStudentParent() {
 	const navigation = useNavigation();
@@ -32,12 +33,7 @@ export default function SearchStudentParent() {
 					</View>
 				</>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleBack}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>
 	);
 }

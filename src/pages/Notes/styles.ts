@@ -11,6 +11,5 @@ export const specificStyles = StyleSheet.create({
 	cardButton: {
 		paddingVertical: 20,
 		minWidth: '90%',
-		backgroundColor: '#e32f45',
 	},
 });

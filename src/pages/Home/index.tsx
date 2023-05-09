@@ -1,34 +1,25 @@
-import React, { useState } from 'react';
-import {
-	ScrollView,
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-} from 'react-native';
+import React from 'react';
+import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Card from '../../components/Card';
-import { propsBottom } from '../mainBottomTabParams';
 import { useNavigation } from '@react-navigation/native';
+import { propsBottom } from '../mainBottomTabParams';
 import { globalStyles as styles } from '../../styles/globalStyles';
 import { specificStyles } from './styles';
+
+const NAVIGATION_MAP: any = {
+	Search: 'Search',
+	Add: 'Add',
+	Rel: 'Rel',
+	Profile: 'Profile',
+};
 
 export default function Home() {
 	const navigation = useNavigation<propsBottom>();
 
 	const handleNavigate = (place: string) => {
-		switch (place) {
-			case 'Search':
-				navigation.navigate('Search');
-				break;
-			case 'Add':
-				navigation.navigate('Add');
-				break;
-			case 'Rel':
-				navigation.navigate('Rel');
-				break;
-			case 'Profile':
-				navigation.navigate('Profile');
-				break;
+		const destination = NAVIGATION_MAP[place];
+		if (destination) {
+			navigation.navigate(destination);
 		}
 	};
 

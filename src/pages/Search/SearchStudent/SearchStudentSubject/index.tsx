@@ -8,6 +8,9 @@ import { specificStyles } from '../../styles';
 import { useAuth } from '../../../../context/AuthProvider/useAuth';
 import { propsStack } from '../../../mainStackParams';
 import Separator from '../../../../components/Separator';
+import SubjectItem from '../../../../components/SubjectItem';
+import ListEmpty from '../../../../components/ListEmpty';
+import Button from '../../../../components/Button';
 
 export default function SearchStudentSubject() {
 	const navigation = useNavigation<propsStack>();
@@ -20,46 +23,31 @@ export default function SearchStudentSubject() {
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
-				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
+				<View
+					style={[
+						styles.cardContainer,
+						specificStyles.cardContainer,
+						{ justifyContent: 'center' },
+					]}
+				>
 					<Text style={[styles.cardText]}>Disciplinas</Text>
-					{auth.estudante[0].disciplinas.length == 0 ? (
-						<View>
-							<Text>Nenhuma disciplina encontrada.</Text>
-						</View>
-					) : (
-						<FlatList
-							style={styles.list}
-							data={auth.estudante[0].disciplinas.reverse()}
-							ItemSeparatorComponent={Separator}
-							renderItem={({ item }) => (
-								<View style={styles.listButton}>
-									<Text style={styles.cardButtonText}>
-										Matéria : {item.nome}
-									</Text>
-									<Text style={styles.cardButtonText}>
-										{item.semestre}° semestre
-									</Text>
-									<Text style={styles.cardButtonText}>
-										Turma : {item.turma}
-									</Text>
-								</View>
-							)}
-						/>
-					)}
-					<TouchableOpacity
-						style={[styles.cardButton, { backgroundColor: '#FF3000' }]}
+					<FlatList
+						style={styles.list}
+						data={auth.estudante[0].disciplinas.reverse()}
+						ItemSeparatorComponent={Separator}
+						renderItem={SubjectItem}
+						ListEmptyComponent={ListEmpty({
+							text: 'Nenhuma disciplina relacionada ao estudante.',
+						})}
+					/>
+					<Button
+						text={'Registrar disciplina'}
+						backgroundColor='#FF3000'
 						onPress={() => navigation.navigate('InsertStudentSubject')}
-					>
-						<Text style={styles.cardButtonText}>Registrar disciplina</Text>
-					</TouchableOpacity>
+					/>
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleBack}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>
 	);
 }

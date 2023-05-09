@@ -7,66 +7,46 @@ import { specificStyles } from './styles';
 import Card from '../../components/Card';
 import { propsStack } from '../mainStackParams';
 import { useNavigation } from '@react-navigation/native';
+import NotesButton from '../../components/NotesButton';
+
+const routes: any = {
+	Sent: 'NotesSent',
+	Approved: 'NotesApproved',
+	Repproved: 'NotesRepproved',
+	Obs: 'NotesObs',
+};
 
 export default function Notes() {
 	const navigation = useNavigation<propsStack>();
 	const handleNavigate = (route: string) => {
-		switch (route) {
-			case 'Sent':
-				navigation.navigate('NotesSent');
-				break;
-			case 'Approved':
-				navigation.navigate('NotesApproved');
-				break;
-			case 'Repproved':
-				navigation.navigate('NotesRepproved');
-				break;
-			case 'Obs':
-				navigation.navigate('NotesObs');
-				break;
-		}
+		navigation.navigate(routes[route]);
 	};
+
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
 					<Text style={styles.cardText}>Ocorrências</Text>
-					<TouchableOpacity
-						style={[
-							styles.cardButton,
-							specificStyles.cardButton,
-							{ backgroundColor: '#Faaa00' },
-						]}
+					<NotesButton
+						backgroundColor='#Faaa00'
+						text='Encaminhadas'
 						onPress={() => handleNavigate('Sent')}
-					>
-						<Text style={styles.cardButtonText}>Encaminhadas</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[
-							styles.cardButton,
-							specificStyles.cardButton,
-							{ backgroundColor: '#2Fa33B' },
-						]}
+					/>
+					<NotesButton
+						backgroundColor='#2Fa33B'
+						text='Aprovadas'
 						onPress={() => handleNavigate('Approved')}
-					>
-						<Text style={styles.cardButtonText}>Aprovadas</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.cardButton, specificStyles.cardButton]}
+					/>
+					<NotesButton
+						backgroundColor='#e32f45'
+						text='Reprovadas'
 						onPress={() => handleNavigate('Repproved')}
-					>
-						<Text style={styles.cardButtonText}>Reprovadas</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[
-							styles.cardButton,
-							specificStyles.cardButton,
-							{ backgroundColor: '#0050FF' },
-						]}
+					/>
+					<NotesButton
+						backgroundColor='#0050FF'
+						text='Observações'
 						onPress={() => handleNavigate('Obs')}
-					>
-						<Text style={styles.cardButtonText}>Observações</Text>
-					</TouchableOpacity>
+					/>
 				</View>
 			</Card>
 		</View>

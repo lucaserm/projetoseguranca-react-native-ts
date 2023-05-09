@@ -12,32 +12,41 @@ import Api from '../../../api';
 import { useAuth } from '../../../context/AuthProvider/useAuth';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
+import Loading from '../../../components/Loading';
+import Button from '../../../components/Button';
 
 export default function InsertStudentRegistro() {
 	const navigation = useNavigation();
-	const auth = useAuth();
+	const { estudante, getEstudante } = useAuth();
 	const [message, setMessage] = useState('');
 	const [descricao, setDescricao] = useState('');
 	const [diaLiberacao, setDiaLiberacao] = useState('');
+	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async () => {
-		if (descricao == '') return setMessage('Insira uma descrição.');
-		if (diaLiberacao == '')
-			return setMessage('Insira uma data para liberação.');
+		if (!descricao || !diaLiberacao)
+			return setMessage('Por favor, preencha todos os campos.');
+		setLoading(true);
 		try {
-			await Api.post('/estudante/registro/salvar/?id=' + auth.estudante[0].id, {
+			await Api.post('/estudante/registro/salvar/?id=' + estudante[0].id, {
 				descricao,
 				dia_liberacao: diaLiberacao,
 			});
-			await auth.getEstudante({
-				ra: '',
-				nome: auth.estudante[0].nome,
-				cpf: '',
-			});
+			try {
+				await getEstudante({
+					ra: '',
+					nome: estudante[0].nome,
+					cpf: '',
+				});
+			} catch (e) {
+				setMessage('Ocorreu um erro ao renovar o estudante.');
+			}
+		} catch (e) {
+			setMessage('Ocorreu um erro ao salvar o registro.');
+		} finally {
 			setDescricao('');
 			setDiaLiberacao('');
-		} catch (e) {
-			return;
+			setLoading(false);
 		}
 	};
 
@@ -55,32 +64,31 @@ export default function InsertStudentRegistro() {
 					]}
 				>
 					<Text style={[styles.cardText]}>Inserir Registro</Text>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='DESCRIÇÃO'
-						placeholderTextColor={'#EEE'}
-						value={descricao}
-						onChangeText={(value) => setDescricao(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='DIA DA LIBERAÇÃO'
-						placeholderTextColor={'#EEE'}
-						value={diaLiberacao}
-						onChangeText={(value) => setDiaLiberacao(value)}
-					/>
-					<Separator />
-					<TouchableOpacity style={[styles.cardButton]} onPress={handleSubmit}>
-						<Text style={styles.cardButtonText}>Enviar</Text>
-					</TouchableOpacity>
+					{loading ? (
+						<Loading />
+					) : (
+						<>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='DESCRIÇÃO'
+								placeholderTextColor={'#EEE'}
+								value={descricao}
+								onChangeText={(value) => setDescricao(value)}
+							/>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='DIA DA LIBERAÇÃO'
+								placeholderTextColor={'#EEE'}
+								value={diaLiberacao}
+								onChangeText={(value) => setDiaLiberacao(value)}
+							/>
+							<Separator />
+							<Button text={'Enviar'} onPress={handleSubmit} />
+						</>
+					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

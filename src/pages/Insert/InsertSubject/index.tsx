@@ -17,6 +17,8 @@ import Card from '../../../components/Card';
 import Api from '../../../api';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
+import Loading from '../../../components/Loading';
+import Button from '../../../components/Button';
 
 export default function InsertSubject() {
 	const navigation = useNavigation();
@@ -28,17 +30,22 @@ export default function InsertSubject() {
 	const [turma, setTurma] = useState('');
 
 	const handleSubmit = async () => {
-		if (nome == '') return setMessage('Insira o nome da disciplina.');
-		if (semestre == '') return setMessage('Insira o semestre da disciplina.');
-		if (turma == '') return setMessage('Insira a turma da disciplina.');
+		if (!nome || !semestre || !turma) {
+			return setMessage('Por favor, preencha todos os campos.');
+		}
 		if (isNaN(parseInt(semestre)))
-			return setMessage('O semestre deve ser só números.');
+			return setMessage('O semestre deve conter apenas números.');
 		setLoading(true);
-		await Api.post('disciplina/salvar', { nome, semestre, turma });
-		setLoading(false);
-		setNome('');
-		setSemestre('');
-		setTurma('');
+		try {
+			await Api.post('disciplina/salvar', { nome, semestre, turma });
+		} catch (e) {
+			return setMessage('Ocorreu um erro ao cadastrar a disciplina.');
+		} finally {
+			setNome('');
+			setSemestre('');
+			setTurma('');
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -56,7 +63,7 @@ export default function InsertSubject() {
 				>
 					<Text style={[styles.cardText]}>Inserir Disciplina</Text>
 					{loading ? (
-						<ActivityIndicator />
+						<Loading />
 					) : (
 						<>
 							<TextInput
@@ -81,22 +88,12 @@ export default function InsertSubject() {
 								onChangeText={(value) => setTurma(value)}
 							/>
 							<Separator />
-							<TouchableOpacity
-								style={[styles.cardButton]}
-								onPress={handleSubmit}
-							>
-								<Text style={styles.cardButtonText}>Enviar</Text>
-							</TouchableOpacity>
+							<Button text={'Enviar'} onPress={handleSubmit} />
 						</>
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

@@ -11,6 +11,8 @@ import { specificStyles } from '../styles';
 import Api from '../../../api';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
+import Loading from '../../../components/Loading';
+import Button from '../../../components/Button';
 
 export default function InsertStudent() {
 	const navigation = useNavigation();
@@ -22,57 +24,49 @@ export default function InsertStudent() {
 	const [nomeResponsavel, setNomeResponsavel] = useState('');
 	const [telefoneResponsavel, setTelefoneResponsavel] = useState('');
 	const [emailResponsavel, setEmailResponsavel] = useState('');
+	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async () => {
 		if (
-			nome == '' &&
-			ra == '' &&
-			cpf == '' &&
-			email == '' &&
-			nomeResponsavel == '' &&
-			telefoneResponsavel == '' &&
-			emailResponsavel == ''
+			!nome ||
+			!ra ||
+			!cpf ||
+			!email ||
+			!nomeResponsavel ||
+			!telefoneResponsavel ||
+			!emailResponsavel
 		)
-			return setMessage('Insira algum dado!');
-		if (nome == '') return setMessage('Insira um nome para o estudante!');
-		if (ra == '') return setMessage('Insira um RA para o estudante!');
-		if (cpf == '') return setMessage('Insira um CPF para o estudante!');
-		if (email == '') return setMessage('Insira um email para o estudante!');
-		if (nomeResponsavel == '')
-			return setMessage('Insira um nome para o responsável!');
-		if (telefoneResponsavel == '')
-			return setMessage('Insira um telefone para o responsável!');
-		if (emailResponsavel == '')
-			return setMessage('Insira um email para o responsável!');
-		Api.post('responsavel/salvar', {
-			nome: nomeResponsavel,
-			telefone: telefoneResponsavel,
-			email: emailResponsavel,
-		})
-			.then(({ data }) => {
-				Api.post('estudante/salvar', {
+			return setMessage('Por favor, preencha todos os campos.');
+		setLoading(true);
+		try {
+			const { data } = await Api.post('responsavel/salvar', {
+				nome: nomeResponsavel,
+				telefone: telefoneResponsavel,
+				email: emailResponsavel,
+			});
+			try {
+				await Api.post('estudante/salvar', {
 					nome,
 					cpf,
 					ra,
 					email_institucional: email,
 					responsavel: { id: data.id },
-				})
-					.then(() => {
-						setNome('');
-						setRa('');
-						setCpf('');
-						setEmail('');
-						setNomeResponsavel('');
-						setTelefoneResponsavel('');
-						setEmailResponsavel('');
-					})
-					.catch((e) => {
-						console.log('estudante: ' + e);
-					});
-			})
-			.catch((e) => {
-				console.log('responsável: ' + e);
-			});
+				});
+			} catch (e) {
+				setMessage('Ocorreu um erro ao salvar o estudante.');
+			}
+		} catch (e) {
+			setMessage('Ocorreu um erro ao salvar o responsável.');
+		} finally {
+			setNome('');
+			setRa('');
+			setCpf('');
+			setEmail('');
+			setNomeResponsavel('');
+			setTelefoneResponsavel('');
+			setEmailResponsavel('');
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -83,68 +77,67 @@ export default function InsertStudent() {
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
 					<Text style={[styles.cardText]}>Inserir Estudante</Text>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='NOME ESTUDANTE'
-						placeholderTextColor={'#EEE'}
-						value={nome}
-						onChangeText={(value) => setNome(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='RA ESTUDANTE'
-						placeholderTextColor={'#EEE'}
-						value={ra}
-						onChangeText={(value) => setRa(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='CPF ESTUDANTE'
-						placeholderTextColor={'#EEE'}
-						value={cpf}
-						onChangeText={(value) => setCpf(value)}
-					/>
-					<TextInput
-						style={[styles.cardInput]}
-						placeholder='E-MAIL ESTUDANTE'
-						placeholderTextColor={'#EEE'}
-						value={email}
-						onChangeText={(value) => setEmail(value)}
-					/>
-					<Separator />
-					<TextInput
-						style={styles.cardInput}
-						placeholder='NOME RESPONSÁVEL'
-						placeholderTextColor={'#EEE'}
-						value={nomeResponsavel}
-						onChangeText={(value) => setNomeResponsavel(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='TELEFONE RESPONSÁVEL'
-						placeholderTextColor={'#EEE'}
-						value={telefoneResponsavel}
-						onChangeText={(value) => setTelefoneResponsavel(value)}
-					/>
-					<TextInput
-						style={styles.cardInput}
-						placeholder='E-MAIL RESPONSÁVEL'
-						placeholderTextColor={'#EEE'}
-						value={emailResponsavel}
-						onChangeText={(value) => setEmailResponsavel(value)}
-					/>
-					<Separator />
-					<TouchableOpacity style={[styles.cardButton]} onPress={handleSubmit}>
-						<Text style={styles.cardButtonText}>Enviar</Text>
-					</TouchableOpacity>
+					{loading ? (
+						<Loading />
+					) : (
+						<>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='NOME ESTUDANTE'
+								placeholderTextColor={'#EEE'}
+								value={nome}
+								onChangeText={(value) => setNome(value)}
+							/>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='RA ESTUDANTE'
+								placeholderTextColor={'#EEE'}
+								value={ra}
+								onChangeText={(value) => setRa(value)}
+							/>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='CPF ESTUDANTE'
+								placeholderTextColor={'#EEE'}
+								value={cpf}
+								onChangeText={(value) => setCpf(value)}
+							/>
+							<TextInput
+								style={[styles.cardInput]}
+								placeholder='E-MAIL ESTUDANTE'
+								placeholderTextColor={'#EEE'}
+								value={email}
+								onChangeText={(value) => setEmail(value)}
+							/>
+							<Separator />
+							<TextInput
+								style={styles.cardInput}
+								placeholder='NOME RESPONSÁVEL'
+								placeholderTextColor={'#EEE'}
+								value={nomeResponsavel}
+								onChangeText={(value) => setNomeResponsavel(value)}
+							/>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='TELEFONE RESPONSÁVEL'
+								placeholderTextColor={'#EEE'}
+								value={telefoneResponsavel}
+								onChangeText={(value) => setTelefoneResponsavel(value)}
+							/>
+							<TextInput
+								style={styles.cardInput}
+								placeholder='E-MAIL RESPONSÁVEL'
+								placeholderTextColor={'#EEE'}
+								value={emailResponsavel}
+								onChangeText={(value) => setEmailResponsavel(value)}
+							/>
+							<Separator />
+							<Button text={'Enviar'} onPress={handleSubmit} />
+						</>
+					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

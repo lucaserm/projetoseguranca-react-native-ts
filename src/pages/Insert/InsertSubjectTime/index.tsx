@@ -9,26 +9,23 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { AntDesign } from '@expo/vector-icons';
-
 import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
-
-import Card from '../../../components/Card';
-import Api from '../../../api';
-
 import { IDisciplina } from '../../../context/AuthProvider/types';
+import Api from '../../../api';
+import Card from '../../../components/Card';
 import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
+import Loading from '../../../components/Loading';
+import Button from '../../../components/Button';
 
 export default function InsertSubjectTime() {
 	const navigation = useNavigation();
 
 	const [idDisciplina, setIdDisciplina] = useState('');
 	const [disciplinas, setDisciplinas] = useState<IDisciplina[]>([]);
-
 	const [loading, setLoading] = useState(true);
-	const [message, setMessage] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
 	const [periodo, setPeriodo] = useState('');
 	const [diaSemana, setDiaSemana] = useState('');
 	const [tempoInicio, setTempoInicio] = useState('');
@@ -39,36 +36,61 @@ export default function InsertSubjectTime() {
 	}, []);
 
 	const getData = async () => {
-		const { data } = await Api.get('disciplina/listar');
-		setLoading(false);
-		setDisciplinas(data);
+		try {
+			const { data } = await Api.get('disciplina/listar');
+			setDisciplinas(data);
+		} catch (error) {
+			setErrorMessage('Ocorreu um erro ao buscar as disciplinas.');
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleSubmit = async () => {
-		if (idDisciplina == '') return setMessage('Clique em uma disciplina.');
-		if (periodo == '') return setMessage('Insira o período do horário.');
-		if (diaSemana == '')
-			return setMessage('Insira o dia da semana do horário.');
-		if (tempoInicio == '')
-			return setMessage('Insira o tempo que inicia a aula.');
-		if (tempoFim == '') return setMessage('Insira o tempo que termina a aula');
-		await Api.post('horario/salvar/?id=' + idDisciplina, {
-			periodo: periodo.trim(),
-			dia_semana: diaSemana.trim(),
-			tempo_inicio: tempoInicio.trim(),
-			tempo_fim: tempoFim.trim(),
-		});
-		setIdDisciplina('');
-		setPeriodo('');
-		setDiaSemana('');
-		setTempoInicio('');
-		setTempoFim('');
+		if (!idDisciplina || !periodo || !diaSemana || !tempoInicio || !tempoFim) {
+			return setErrorMessage('Por favor, preencha todos os campos.');
+		}
+		setLoading(true);
+		try {
+			await Api.post(`horario/salvar/?id=${idDisciplina}`, {
+				periodo: periodo.trim(),
+				dia_semana: diaSemana.trim(),
+				tempo_inicio: tempoInicio.trim(),
+				tempo_fim: tempoFim.trim(),
+			});
+		} catch (error) {
+			setErrorMessage('Ocorreu um erro ao cadastrar o horário.');
+		} finally {
+			setIdDisciplina('');
+			setPeriodo('');
+			setDiaSemana('');
+			setTempoInicio('');
+			setTempoFim('');
+			setLoading(false);
+		}
 	};
+
+	const renderItem = ({ item }: { item: IDisciplina }) => (
+		<TouchableOpacity
+			style={[
+				styles.listButton,
+				{ backgroundColor: item.id == idDisciplina ? '#2FA34F' : '#999' },
+			]}
+			onPress={() => setIdDisciplina(item.id)}
+		>
+			<Text>Disciplina: {item.nome}</Text>
+			<Text>{item.semestre} semestre</Text>
+			<Text>Turma : {item.turma}</Text>
+		</TouchableOpacity>
+	);
 
 	return (
 		<View style={[styles.container, specificStyles.container]}>
-			{message !== '' && (
-				<Message message={message} handleClose={() => setMessage('')} />
+			{errorMessage !== '' && (
+				<Message
+					message={errorMessage}
+					handleClose={() => setErrorMessage('')}
+				/>
 			)}
 			<Card position={'center'}>
 				<View
@@ -80,29 +102,14 @@ export default function InsertSubjectTime() {
 				>
 					<Text style={[styles.cardText]}>Horário à Disciplina</Text>
 					{loading ? (
-						<ActivityIndicator />
+						<Loading />
 					) : (
 						<>
 							<FlatList
 								style={{ height: 100, width: '90%' }}
 								data={disciplinas}
 								ItemSeparatorComponent={Separator}
-								renderItem={({ item }) => (
-									<TouchableOpacity
-										style={[
-											styles.listButton,
-											{
-												backgroundColor:
-													item.id == idDisciplina ? '#2FF31F' : '#2FA34F',
-											},
-										]}
-										onPress={() => setIdDisciplina(item.id)}
-									>
-										<Text>Disciplina: {item.nome}</Text>
-										<Text>{item.semestre} semestre</Text>
-										<Text>Turma : {item.turma}</Text>
-									</TouchableOpacity>
-								)}
+								renderItem={renderItem}
 							/>
 							<TextInput
 								style={styles.cardInput}
@@ -133,22 +140,12 @@ export default function InsertSubjectTime() {
 								onChangeText={(value) => setTempoFim(value)}
 							/>
 							<Separator />
-							<TouchableOpacity
-								style={[styles.cardButton]}
-								onPress={handleSubmit}
-							>
-								<Text style={styles.cardButtonText}>Enviar</Text>
-							</TouchableOpacity>
+							<Button text={'Enviar'} onPress={handleSubmit} />
 						</>
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, { marginTop: 15 }]}
-				onPress={() => navigation.goBack()}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={() => navigation.goBack()} back={true} />
 		</View>
 	);
 }

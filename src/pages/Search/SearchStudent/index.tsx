@@ -7,6 +7,8 @@ import { useAuth } from '../../../context/AuthProvider/useAuth';
 import { propsStack } from '../../mainStackParams';
 import Separator from '../../../components/Separator';
 import { IEstudante } from '../../../context/AuthProvider/types';
+import Button from '../../../components/Button';
+import StudentItem from '../../../components/StudentItem';
 
 export default function SearchStudent() {
 	const navigation = useNavigation<propsStack>();
@@ -32,19 +34,6 @@ export default function SearchStudent() {
 		navigation.navigate('SearchStudentSubject');
 	};
 
-	const Lista = ({ item }: { item: IEstudante }) => (
-		<TouchableOpacity
-			style={styles.listButton}
-			onPress={() => {
-				auth.setStudent(item);
-			}}
-		>
-			<Text>{item.nome}</Text>
-			<Text>{item.ra}</Text>
-			<Text>{item.cpf}</Text>
-		</TouchableOpacity>
-	);
-
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
@@ -62,42 +51,22 @@ export default function SearchStudent() {
 							<Text>{auth.estudante[0].cpf}</Text>
 							<Text>{auth.estudante[0].ra}</Text>
 							<Text>{auth.estudante[0].email_institucional}</Text>
-							<TouchableOpacity
-								style={[
-									styles.cardButton,
-									{ backgroundColor: '#FF3000', width: '100%' },
-								]}
-								onPress={handleOcorrencia}
-							>
-								<Text style={styles.cardButtonText}>Ocorrências</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[
-									styles.cardButton,
-									{ backgroundColor: '#FF3000', width: '100%' },
-								]}
-								onPress={handleRequisicao}
-							>
-								<Text style={styles.cardButtonText}>Liberações</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[
-									styles.cardButton,
-									{ backgroundColor: '#FF3000', width: '100%' },
-								]}
-								onPress={handleResponsavel}
-							>
-								<Text style={styles.cardButtonText}>Responsável</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[
-									styles.cardButton,
-									{ backgroundColor: '#FF3000', width: '100%' },
-								]}
+							<Button
+								text={'Disciplinas'}
+								backgroundColor='#Faaa00'
 								onPress={handleDisciplinas}
-							>
-								<Text style={styles.cardButtonText}>Disciplinas</Text>
-							</TouchableOpacity>
+							/>
+							<Button text={'Responsável'} onPress={handleResponsavel} />
+							<Button
+								text={'Liberações'}
+								backgroundColor='#0050FF'
+								onPress={handleRequisicao}
+							/>
+							<Button
+								text={'Ocorrências'}
+								backgroundColor='#e32f45'
+								onPress={handleOcorrencia}
+							/>
 						</>
 					)}
 					{auth.estudante.length > 1 && (
@@ -111,18 +80,15 @@ export default function SearchStudent() {
 								style={styles.list}
 								data={auth.estudante}
 								ItemSeparatorComponent={Separator}
-								renderItem={Lista}
+								renderItem={({ item }) =>
+									StudentItem({ item, onPress: auth.setStudent })
+								}
 							/>
 						</>
 					)}
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleBack}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>
 	);
 }

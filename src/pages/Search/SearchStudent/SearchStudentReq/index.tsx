@@ -8,6 +8,7 @@ import { specificStyles } from '../../styles';
 import { useAuth } from '../../../../context/AuthProvider/useAuth';
 import { propsStack } from '../../../mainStackParams';
 import Separator from '../../../../components/Separator';
+import Button from '../../../../components/Button';
 
 export default function SearchStudentReq() {
 	const navigation = useNavigation<propsStack>();
@@ -39,20 +40,14 @@ export default function SearchStudentReq() {
 							)}
 						/>
 					)}
-					<TouchableOpacity
-						style={[styles.cardButton, { backgroundColor: '#FF3000' }]}
+					<Button
+						text={'Criar registro'}
+						backgroundColor='#FF3000'
 						onPress={() => navigation.navigate('InsertStudentRegistro')}
-					>
-						<Text style={styles.cardButtonText}>Criar registro</Text>
-					</TouchableOpacity>
+					/>
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleBack}
-			>
-				<Text style={styles.cardButtonText}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>
 	);
 }

@@ -1,23 +1,20 @@
 import { useEffect, useState } from 'react';
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	ActivityIndicator,
-	FlatList,
-} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles as styles } from '../../../../styles/globalStyles';
-
-import Card from '../../../../components/Card';
 
 import { specificStyles } from '../../styles';
 import { useAuth } from '../../../../context/AuthProvider/useAuth';
 import { propsStack } from '../../../mainStackParams';
 import { OcorrenciaRequest } from '../../../../context/AuthProvider/util';
 import { IOcorrencia } from '../../../../context/AuthProvider/types';
+
+import Card from '../../../../components/Card';
 import Separator from '../../../../components/Separator';
+import Button from '../../../../components/Button';
+import ListEmpty from '../../../../components/ListEmpty';
+import Loading from '../../../../components/Loading';
 
 export default function SearchStudentNote() {
 	const [ocorrencias, setOcorrencia] = useState<IOcorrencia[]>([]);
@@ -47,17 +44,16 @@ export default function SearchStudentNote() {
 			<Card position={'center'}>
 				<View style={[styles.cardContainer, specificStyles.cardContainer]}>
 					<Text style={[styles.cardText]}>Ocorrências</Text>
-					{loading && <ActivityIndicator />}
-					{!ocorrencias && (
-						<View>
-							<Text>Nenhuma ocorrência encontrada.</Text>
-						</View>
-					)}
-					{ocorrencias && ocorrencias.length > 0 && (
+					{loading ? (
+						<Loading />
+					) : (
 						<FlatList
 							data={ocorrencias.reverse()}
 							style={styles.list}
 							ItemSeparatorComponent={Separator}
+							ListEmptyComponent={ListEmpty({
+								text: 'Nenhuma ocorrência encontrada.',
+							})}
 							renderItem={({ item }) => (
 								<TouchableOpacity
 									style={[
@@ -81,22 +77,13 @@ export default function SearchStudentNote() {
 							)}
 						/>
 					)}
-					<TouchableOpacity
-						style={[styles.cardButton]}
+					<Button
+						text={'Criar ocorrência'}
 						onPress={() => navigation.navigate('InsertStudentNotes')}
-					>
-						<Text style={{ textAlign: 'center', color: '#FAFAFA' }}>
-							Criar ocorrência
-						</Text>
-					</TouchableOpacity>
+					/>
 				</View>
 			</Card>
-			<TouchableOpacity
-				style={[styles.cardButton, specificStyles.cardButton]}
-				onPress={handleBack}
-			>
-				<Text style={{ textAlign: 'center', color: '#FAFAFA' }}>Voltar</Text>
-			</TouchableOpacity>
+			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>
 	);
 }

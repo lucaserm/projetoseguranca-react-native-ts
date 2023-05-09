@@ -45,7 +45,6 @@ export async function EstudanteRequest({
 export async function OcorrenciaRequest(id: string) {
 	try {
 		const request = await Api.get('ocorrencia/listar/' + id);
-		if (request.data.length == 0) return null;
 		return request.data;
 	} catch (error) {
 		return null;
