@@ -15,6 +15,7 @@ import Card from '../../components/Card';
 import Message from '../../components/Message';
 import Loading from '../../components/Loading';
 import Button from '../../components/Button';
+import Api from '../../api';
 
 export default function Login() {
 	const [code, setCode] = useState('');
@@ -24,8 +25,24 @@ export default function Login() {
 	const auth = useAuth();
 	const navigation = useNavigation<propsStack>();
 
+	const handleServer = async () => {
+		setLoading(true);
+		try {
+			await Api.post('usuario/salvar', {
+				nome: 'Lia Quinta',
+				codigo: '001',
+				senha: 'coordenacao',
+				cargo: 'Coordenação',
+			});
+		} catch (e) {
+			setMessage('Ocorreu um erro ao salvar o usuário.');
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	const handleFinish = async () => {
-		if (!code || !!password) {
+		if (!code || !password) {
 			return setMessage('Por favor, preencha todos os campos.');
 		}
 		setLoading(true);
@@ -47,7 +64,7 @@ export default function Login() {
 				<Message message={message} handleClose={() => setMessage('')} />
 			) : null}
 			{auth.loading ? (
-				<Loading />
+				<ActivityIndicator size='large' />
 			) : (
 				<Card position='center'>
 					<View style={[styles.cardContainer, specificStyles.cardContainer]}>
@@ -67,9 +84,16 @@ export default function Login() {
 							style={specificStyles.inputText}
 						/>
 						{loading ? (
-							<ActivityIndicator size='large' />
+							<Loading />
 						) : (
-							<Button text={'Entrar'} onPress={handleFinish} back={true} />
+							<>
+								<Button
+									text={'Criar Servidor'}
+									onPress={handleServer}
+									back={true}
+								/>
+								<Button text={'Entrar'} onPress={handleFinish} back={true} />
+							</>
 						)}
 					</View>
 				</Card>

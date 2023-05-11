@@ -11,18 +11,18 @@ import { useNavigation } from '@react-navigation/native';
 import { globalStyles as styles } from '../../../styles/globalStyles';
 import { specificStyles } from '../styles';
 
-import Card from '../../../components/Card';
-import Message from '../../../components/Message';
 import { IOcorrencia } from '../../../context/AuthProvider/types';
+import { propsStack } from '../../mainStackParams';
 import Api from '../../../api';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import Message from '../../../components/Message';
 import Separator from '../../../components/Separator';
 import NotesItem from '../../../components/NotesItem';
 import ListEmpty from '../../../components/ListEmpty';
-import Button from '../../../components/Button';
 
 export default function NotesObs() {
-	const navigation = useNavigation();
-
+	const navigation = useNavigation<propsStack>();
 	const [message, setMessage] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [ocorrencias, setOcorrencias] = useState<IOcorrencia[]>([]);
@@ -39,12 +39,16 @@ export default function NotesObs() {
 			const filteredOcorrencias = data.filter(
 				(ocorrencia) => ocorrencia.status === 'Observação'
 			);
-			setOcorrencias(filteredOcorrencias);
+			setOcorrencias(filteredOcorrencias.reverse());
 		} catch (error) {
 			setMessage('Erro ao buscar as ocorrências');
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleRelate = (item: IOcorrencia) => {
+		navigation.navigate('NotesRelate', item);
 	};
 
 	return (
@@ -68,7 +72,9 @@ export default function NotesObs() {
 							style={styles.list}
 							data={ocorrencias}
 							ItemSeparatorComponent={Separator}
-							renderItem={NotesItem}
+							renderItem={({ item }) =>
+								NotesItem({ item, onPress: handleRelate })
+							}
 							ListEmptyComponent={ListEmpty({
 								text: 'Nenhuma observação registrada.',
 							})}

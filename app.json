@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "aplicativo",
-    "slug": "aplicativo",
+    "slug": "projetoseguranca",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,8 +29,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "626fd5b4-3342-4d50-9627-903ac4f6a847"
+        "projectId": "f00d2381-e03e-4f13-9df7-db4d315188ef"
       }
-    }
+    },
+    "owner": "zkay"
   }
 }

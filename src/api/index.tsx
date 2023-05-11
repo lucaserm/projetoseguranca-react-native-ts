@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { getUserLocalStorage } from '../context/AuthProvider/util';
 
 const Api = axios.create({
-	baseURL: 'http://192.168.100.5:9090/',
+	baseURL: 'https://projetoseguranca-api.herokuapp.com/',
 });
 
 /* Api.interceptors.request.use(

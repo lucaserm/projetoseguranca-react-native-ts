@@ -15,6 +15,7 @@ import Separator from '../../../../components/Separator';
 import Button from '../../../../components/Button';
 import ListEmpty from '../../../../components/ListEmpty';
 import Loading from '../../../../components/Loading';
+import NotesItem from '../../../../components/NotesItem';
 
 export default function SearchStudentNote() {
 	const [ocorrencias, setOcorrencia] = useState<IOcorrencia[]>([]);
@@ -39,6 +40,10 @@ export default function SearchStudentNote() {
 		navigation.goBack();
 	};
 
+	const handleRelate = (item: IOcorrencia) => {
+		navigation.navigate('NotesRelate', item);
+	};
+
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
@@ -54,27 +59,9 @@ export default function SearchStudentNote() {
 							ListEmptyComponent={ListEmpty({
 								text: 'Nenhuma ocorrência encontrada.',
 							})}
-							renderItem={({ item }) => (
-								<TouchableOpacity
-									style={[
-										styles.listButton,
-										{
-											backgroundColor:
-												item.status == 'Encaminhada'
-													? '#Faca00'
-													: item.status == 'Encaminhada'
-													? '#2FA34F'
-													: item.status == 'Observação'
-													? '#00F0FF'
-													: '#e32f45',
-										},
-									]}
-								>
-									<Text>Data da ocorrência: {item.data_ocorrencia}</Text>
-									<Text>Usuário: {item.usuario.nome}</Text>
-									<Text>Relatório: {item.relatorio}</Text>
-								</TouchableOpacity>
-							)}
+							renderItem={({ item }) =>
+								NotesItem({ item, status: item.status, onPress: handleRelate })
+							}
 						/>
 					)}
 					<Button

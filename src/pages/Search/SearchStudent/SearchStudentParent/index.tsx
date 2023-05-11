@@ -19,19 +19,17 @@ export default function SearchStudentParent() {
 	return (
 		<View style={[styles.container, specificStyles.container]}>
 			<Card position={'center'}>
-				<>
-					<View style={styles.cardContainer}>
-						<Text style={[styles.cardText]}>Responsável</Text>
+				<View style={styles.cardContainer}>
+					<Text style={[styles.cardText]}>Responsável</Text>
 
-						{auth.estudante?.length == 1 && (
-							<>
-								<Text>{auth.estudante[0].responsavel.nome}</Text>
-								<Text>{auth.estudante[0].responsavel.email}</Text>
-								<Text>{auth.estudante[0].responsavel.telefone}</Text>
-							</>
-						)}
-					</View>
-				</>
+					{auth.estudante?.length == 1 && (
+						<>
+							<Text>{auth.estudante[0].responsavel.nome}</Text>
+							<Text>{auth.estudante[0].responsavel.email}</Text>
+							<Text>{auth.estudante[0].responsavel.telefone}</Text>
+						</>
+					)}
+				</View>
 			</Card>
 			<Button text={'Voltar'} onPress={handleBack} back={true} />
 		</View>

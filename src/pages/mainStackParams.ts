@@ -1,4 +1,6 @@
+import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { IOcorrencia } from '../context/AuthProvider/types';
 
 export type stackParamList = {
 	Login: undefined;
@@ -10,6 +12,7 @@ export type stackParamList = {
 	SearchStudentReq: undefined;
 	SearchStudentNote: undefined;
 	SearchStudentSubject: undefined;
+	SearchStudentCurso: undefined;
 	//Rotas de cadastro
 	InsertIndex: undefined;
 	InsertStudent: undefined;
@@ -27,6 +30,11 @@ export type stackParamList = {
 	NotesApproved: undefined;
 	NotesRepproved: undefined;
 	NotesObs: undefined;
+	NotesRelate: IOcorrencia;
 };
 
 export type propsStack = NativeStackNavigationProp<stackParamList>;
+export type RootRouteProps<RouteName extends keyof stackParamList> = RouteProp<
+	stackParamList,
+	RouteName
+>;

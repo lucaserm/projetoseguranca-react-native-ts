@@ -5,6 +5,7 @@ import NotesSent from '../../pages/Notes/NotesSent';
 import NotesApproved from '../../pages/Notes/NotesApproved';
 import NotesRepproved from '../../pages/Notes/NotesRepproved';
 import NotesObs from '../../pages/Notes/NotesObs';
+import NotesRelate from '../../pages/Notes/NotesRelate';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function NotesStack() {
 			<Stack.Screen name='NotesApproved' component={NotesApproved} />
 			<Stack.Screen name='NotesRepproved' component={NotesRepproved} />
 			<Stack.Screen name='NotesObs' component={NotesObs} />
+			<Stack.Screen name='NotesRelate' component={NotesRelate} />
 		</Stack.Navigator>
 	);
 }

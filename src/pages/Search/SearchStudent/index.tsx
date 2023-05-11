@@ -9,6 +9,15 @@ import Separator from '../../../components/Separator';
 import { IEstudante } from '../../../context/AuthProvider/types';
 import Button from '../../../components/Button';
 import StudentItem from '../../../components/StudentItem';
+import Actions from '../../../components/Actions';
+
+const routes: any = {
+	Cursos: 'SearchStudentCurso',
+	Disciplinas: 'SearchStudentSubject',
+	Responsável: 'SearchStudentParent',
+	Liberação: 'SearchStudentReq',
+	Ocorrências: 'SearchStudentNote',
+};
 
 export default function SearchStudent() {
 	const navigation = useNavigation<propsStack>();
@@ -18,20 +27,8 @@ export default function SearchStudent() {
 		navigation.goBack();
 	};
 
-	const handleOcorrencia = () => {
-		navigation.navigate('SearchStudentNote');
-	};
-
-	const handleRequisicao = () => {
-		navigation.navigate('SearchStudentReq');
-	};
-
-	const handleResponsavel = () => {
-		navigation.navigate('SearchStudentParent');
-	};
-
-	const handleDisciplinas = () => {
-		navigation.navigate('SearchStudentSubject');
+	const handleNavigate = (route: string) => {
+		navigation.navigate(routes[route]);
 	};
 
 	return (
@@ -48,25 +45,18 @@ export default function SearchStudent() {
 							>
 								{auth.estudante[0].nome}
 							</Text>
-							<Text>{auth.estudante[0].cpf}</Text>
-							<Text>{auth.estudante[0].ra}</Text>
-							<Text>{auth.estudante[0].email_institucional}</Text>
-							<Button
-								text={'Disciplinas'}
-								backgroundColor='#Faaa00'
-								onPress={handleDisciplinas}
-							/>
-							<Button text={'Responsável'} onPress={handleResponsavel} />
-							<Button
-								text={'Liberações'}
-								backgroundColor='#0050FF'
-								onPress={handleRequisicao}
-							/>
-							<Button
-								text={'Ocorrências'}
-								backgroundColor='#e32f45'
-								onPress={handleOcorrencia}
-							/>
+							<Text>RA: {auth.estudante[0].ra}</Text>
+							<Text>CPF: {auth.estudante[0].cpf}</Text>
+							<Text>E-mail: {auth.estudante[0].email_institucional}</Text>
+							<Text>
+								Quantidade de disciplinas atreladas:{' '}
+								{auth.estudante[0].disciplinas.length}
+							</Text>
+							<Text>
+								Quantidade de pedidos de liberação:{' '}
+								{auth.estudante[0].registros.length}
+							</Text>
+							<Actions onPress={handleNavigate} />
 						</>
 					)}
 					{auth.estudante.length > 1 && (

@@ -10,6 +10,8 @@ import InsertStudentNotes from '../../pages/Insert/InsertStudentNotes';
 import InsertStudentRegistro from '../../pages/Insert/InsertStudentRegistro';
 import SearchStudentSubject from '../../pages/Search/SearchStudent/SearchStudentSubject';
 import InsertStudentSubject from '../../pages/Insert/InsertStudentSubject';
+import NotesRelate from '../../pages/Notes/NotesRelate';
+import SearchStudentCurso from '../../pages/Search/SearchStudent/SearchStudentCurso';
 
 const Stack = createStackNavigator();
 
@@ -27,6 +29,7 @@ export default function SearchStack() {
 				name='InsertStudentRegistro'
 				component={InsertStudentRegistro}
 			/>
+			<Stack.Screen name='SearchStudentCurso' component={SearchStudentCurso} />
 			<Stack.Screen
 				name='SearchStudentSubject'
 				component={SearchStudentSubject}
@@ -36,6 +39,7 @@ export default function SearchStack() {
 				component={InsertStudentSubject}
 			/>
 			<Stack.Screen name='SearchStudentNote' component={SearchStudentNote} />
+			<Stack.Screen name='NotesRelate' component={NotesRelate} />
 			<Stack.Screen name='InsertStudentNotes' component={InsertStudentNotes} />
 		</Stack.Navigator>
 	);
