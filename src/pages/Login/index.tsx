@@ -25,22 +25,6 @@ export default function Login() {
 	const auth = useAuth();
 	const navigation = useNavigation<propsStack>();
 
-	const handleServer = async () => {
-		setLoading(true);
-		try {
-			await Api.post('usuario/salvar', {
-				nome: 'Lia Quinta',
-				codigo: '001',
-				senha: 'coordenacao',
-				cargo: 'Coordenação',
-			});
-		} catch (e) {
-			setMessage('Ocorreu um erro ao salvar o usuário.');
-		} finally {
-			setLoading(false);
-		}
-	};
-
 	const handleFinish = async () => {
 		if (!code || !password) {
 			return setMessage('Por favor, preencha todos os campos.');
@@ -86,14 +70,7 @@ export default function Login() {
 						{loading ? (
 							<Loading />
 						) : (
-							<>
-								<Button
-									text={'Criar Servidor'}
-									onPress={handleServer}
-									back={true}
-								/>
-								<Button text={'Entrar'} onPress={handleFinish} back={true} />
-							</>
+							<Button text={'Entrar'} onPress={handleFinish} back={true} />
 						)}
 					</View>
 				</Card>
